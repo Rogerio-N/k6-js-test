@@ -13,17 +13,8 @@ const session = new Httpx({
     timeout: DEFAULT_TIMEOUT
 })
 
-const randomPizzaRequirements = JSON.stringify({
-    maxCaloriesPerSlice: 1000,
-    mustBeVegetarian: false,
-    excludedIngredients: [],
-    excludedTools: [],
-    maxNumberOfToppings: 5,
-    minNumberOfToppings: 2,
-    customName: ""
-})
-
 const ingredientsCounter = new Counter('ingredients_counter')
+const pizzaCounter = new Counter('pizza_counter')
 
 export const options = {
     thresholds: {
@@ -56,8 +47,21 @@ export const options = {
 export default function () {
     describe('Get pizza suggestion', () => {
         describe('Should get a random pizza suggestion with default requirements', () => {
+
+            const randomPizzaRequirements = JSON.stringify({
+                maxCaloriesPerSlice: 1000,
+                mustBeVegetarian: false,
+                excludedIngredients: [],
+                excludedTools: [],
+                maxNumberOfToppings: 5,
+                minNumberOfToppings: 2,
+                customName: ""
+            })
+
             const response = session.post(`/pizza`, randomPizzaRequirements)
             expect(response.status, 'response status').to.equal(200)
+
+            pizzaCounter.add(1)
 
             const body = response.json()
             const ingredients = body.pizza.ingredients

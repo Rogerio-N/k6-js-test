@@ -2,7 +2,8 @@ import { describe, expect } from 'https://jslib.k6.io/k6chaijs/4.5.0.1/index.js'
 import { Httpx } from 'https://jslib.k6.io/httpx/0.1.0/index.js';
 import { Counter } from 'k6/metrics';
 import tempo from 'https://jslib.k6.io/http-instrumentation-tempo/1.0.1/index.js';
-import { DEFAULT_HEADERS, DEFAULT_TIMEOUT, LOCAL_API_URL } from '../constants.js';
+import { DEFAULT_HEADERS, DEFAULT_TIMEOUT, LOCAL_API_URL } from '../utils/constants.js';
+import { CONSTANT_RATE_TEST, SMOKE_TEST, SPIKE_TEST } from '../utils/scenarios.js';
 
 const baseURL = __ENV.BASE_URL || LOCAL_API_URL
 
@@ -27,24 +28,16 @@ export const options = {
         http_req_failed: ['rate<0.01']
     },
     scenarios: {
+        smoke_scenario: {
+            ...SMOKE_TEST
+        },
         constant_search: {
-            executor: 'constant-arrival-rate',
-            duration: '1m',
-            rate: 2,
-            timeUnit: '1s',
-            preAllocatedVUs: 2,
-            maxVUs: 5
+            ...CONSTANT_RATE_TEST,
+            startTime: SMOKE_TEST.duration
         },
         spiked_search: {
-            executor: 'ramping-arrival-rate',
-            startRate: 0,
-            timeUnit: '1m',
-            preAllocatedVUs: 5,
-            maxVUs: 8,
-            stages: [
-                { target: 360, duration: '1m' },
-                { target: 0, duration: '30s' }
-            ]
+            ...SPIKE_TEST,
+            startTime: SMOKE_TEST.duration
         }
     }
 }

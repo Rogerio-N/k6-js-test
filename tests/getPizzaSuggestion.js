@@ -1,4 +1,4 @@
-import { describe, expect } from 'https://jslib.k6.io/k6chaijs/4.3.4.3/index.js';
+import { describe, expect } from 'https://jslib.k6.io/k6chaijs/4.5.0.1/index.js';
 import { Httpx } from 'https://jslib.k6.io/httpx/0.1.0/index.js';
 import { Counter } from 'k6/metrics';
 import { DEFAULT_HEADERS, DEFAULT_TIMEOUT, LOCAL_API_URL } from '../constants.js';
@@ -34,8 +34,8 @@ export const options = {
             executor: 'ramping-arrival-rate',
             startRate: 0,
             timeUnit: '1m',
-            preAllocatedVUs: 10,
-            maxVUs: 15,
+            preAllocatedVUs: 5,
+            maxVUs: 8,
             stages: [
                 { target: 360, duration: '1m' },
                 { target: 0, duration: '30s' }
@@ -74,6 +74,44 @@ export default function () {
                     ingredientName : ingredient.name,
                 })
             })
+        })
+
+        describe('Should get a pizza suggest with custom filters', () => {
+            const filteredPizzaRequirements = {
+                maxCaloriesPerSlice: 500,
+                mustBeVegetarian: false,
+                excludedIngredients: [],
+                excludedTools: [
+                    "Scissors"
+                ],
+                maxNumberOfToppings: 7,
+                minNumberOfToppings: 1,
+                customName: ""
+            }
+
+            const response = session.post(`/pizza`, JSON.stringify(filteredPizzaRequirements), {
+                tags: {
+                    filterType: 'custom'
+                }
+            })
+            expect(response.status, 'response status').to.equal(200)
+
+            expect(response.json().calories, 'calories').to.be.at.most(filteredPizzaRequirements.maxCaloriesPerSlice)
+            
+            expect(response.json().pizza.tool, 'tool used').to.not.contain.oneOf(filteredPizzaRequirements.excludedTools)
+
+            expect(response.json().pizza.ingredients, 'ingredients').to.have.lengthOf.at.least(filteredPizzaRequirements.minNumberOfToppings)
+            expect(response.json().pizza.ingredients, 'ingredients').to.have.lengthOf.at.most(filteredPizzaRequirements.maxNumberOfToppings)
+
+            pizzaCounter.add(1)
+
+            const ingredients = response.json().pizza.ingredients
+            ingredients.forEach(ingredient => {
+                ingredientsCounter.add(1, {
+                    ingredientName : ingredient.name,
+                })
+            })
+
         })
     })
 }

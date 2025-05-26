@@ -1,9 +1,14 @@
 import { describe, expect } from 'https://jslib.k6.io/k6chaijs/4.5.0.1/index.js';
 import { Httpx } from 'https://jslib.k6.io/httpx/0.1.0/index.js';
 import { Counter } from 'k6/metrics';
+import tempo from 'https://jslib.k6.io/http-instrumentation-tempo/1.0.1/index.js';
 import { DEFAULT_HEADERS, DEFAULT_TIMEOUT, LOCAL_API_URL } from '../constants.js';
 
 const baseURL = __ENV.BASE_URL || LOCAL_API_URL
+
+tempo.instrumentHTTP({
+  propagator: 'w3c',
+})
 
 const session = new Httpx({
     baseURL,

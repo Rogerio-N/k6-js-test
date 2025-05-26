@@ -58,7 +58,11 @@ export default function () {
                 customName: ""
             })
 
-            const response = session.post(`/pizza`, randomPizzaRequirements)
+            const response = session.post(`/pizza`, randomPizzaRequirements, {
+                tags: {
+                    filterType: 'default'
+                }
+            })
             expect(response.status, 'response status').to.equal(200)
 
             pizzaCounter.add(1)

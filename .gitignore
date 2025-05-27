@@ -1,0 +1,3 @@
+#Ignore k6 custom binary with extesions and its results
+k6.exe
+test-report.html

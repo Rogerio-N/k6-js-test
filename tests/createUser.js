@@ -4,6 +4,7 @@ import { Httpx } from 'https://jslib.k6.io/httpx/0.1.0/index.js'
 import tempo from 'https://jslib.k6.io/http-instrumentation-tempo/1.0.1/index.js'
 import { DEFAULT_HEADERS, DEFAULT_TIMEOUT, LOCAL_API_URL } from '../utils/constants.js'
 import { CONSTANT_RATE_TEST, SMOKE_TEST, SPIKE_TEST } from '../utils/scenarios.js'
+import http from 'k6/http'
 
 const baseURL = __ENV.BASE_URL || LOCAL_API_URL
 
@@ -64,6 +65,23 @@ export default function () {
 
             expect(loginResponse.status, 'Login response status').to.equal(200)
             expect(loginResponse.json().token, 'Login Token').to.be.a('string').and.not.empty
+        })
+
+        describe('Should fail to create a user with an existing username', () => {
+            const existingUserPayload = {
+                username: 'synthetics_multihttp_example',
+                password: randomString(16)
+            }
+
+            const createUserResponse = session.post('/users', JSON.stringify(existingUserPayload), {
+                responseCallback: http.expectedStatuses(400),
+                tags: {
+                    request_name: 'create_existing_user'
+                }
+            })
+
+            expect(createUserResponse.status, 'Create existing user response status').to.equal(400)
+            expect(createUserResponse.json().error, 'Error message').to.include('username already taken')
         })
     })
 }

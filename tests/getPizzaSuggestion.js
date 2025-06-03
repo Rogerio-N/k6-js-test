@@ -2,17 +2,17 @@ import { describe, expect } from 'https://jslib.k6.io/k6chaijs/4.5.0.1/index.js'
 import { Httpx } from 'https://jslib.k6.io/httpx/0.1.0/index.js';
 import { Counter } from 'k6/metrics';
 import tempo from 'https://jslib.k6.io/http-instrumentation-tempo/1.0.1/index.js';
-import { DEFAULT_HEADERS, DEFAULT_TIMEOUT, LOCAL_API_URL } from '../utils/constants.js';
+import { DEFAULT_HEADERS, DEFAULT_TIMEOUT, LOCAL_URL } from '../utils/constants.js';
 import { CONSTANT_RATE_TEST, SMOKE_TEST, SPIKE_TEST } from '../utils/scenarios.js';
 
-const baseURL = __ENV.BASE_URL || LOCAL_API_URL
+const baseURL = __ENV.BASE_URL || LOCAL_URL
 
 tempo.instrumentHTTP({
   propagator: 'w3c',
 })
 
 const session = new Httpx({
-    baseURL,
+    baseURL: baseURL+'/api',
     headers: {
         ...DEFAULT_HEADERS
     },

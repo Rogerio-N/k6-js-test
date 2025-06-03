@@ -1,4 +1,4 @@
-export const LOCAL_API_URL = 'http://localhost:3333/api';
+export const LOCAL_URL = 'http://localhost:3333';
 
 export const CONTENT_TYPE = 'application/json';
 export const AUTHORIZATION_TOKEN = 'Token abcdef0123456789'

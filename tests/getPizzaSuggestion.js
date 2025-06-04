@@ -33,20 +33,20 @@ export const options = {
         http_req_failed: ['rate<0.01']
     },
     scenarios: {
-        // smoke_scenario: {
-        //     ...SMOKE_TEST,
-        //     exec: 'backendTest'
-        // },
-        // constant_search: {
-        //     ...CONSTANT_RATE_TEST,
-        //     startTime: SMOKE_TEST.duration,
-        //     exec: 'backendTest'
-        // },
-        // spiked_search: {
-        //     ...SPIKE_TEST,
-        //     startTime: SMOKE_TEST.duration,
-        //     exec: 'backendTest'
-        // },
+        smoke_scenario: {
+            ...SMOKE_TEST,
+            exec: 'backendTest'
+        },
+        constant_search: {
+            ...CONSTANT_RATE_TEST,
+            startTime: SMOKE_TEST.duration,
+            exec: 'backendTest'
+        },
+        spiked_search: {
+            ...SPIKE_TEST,
+            startTime: SMOKE_TEST.duration,
+            exec: 'backendTest'
+        },
         frontend_scenario: {
             ...SMOKE_TEST,
             duration: '30s',
